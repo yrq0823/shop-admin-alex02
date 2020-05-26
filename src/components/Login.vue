@@ -43,8 +43,9 @@ export default {
     async login () {
       try {
         await this.$refs.form.validate()
-        const { meta } = await this.$axios.post('login', this.form)
+        const { meta, data } = await this.$axios.post('login', this.form)
         if (meta.status === 200) {
+          localStorage.setItem('token', data.token)
           this.$message.success(meta.msg)
           this.$router.push('/index')
         } else {
