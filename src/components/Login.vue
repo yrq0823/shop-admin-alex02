@@ -3,10 +3,10 @@
     <el-form status-icon ref="form"  :rules="rules" :model='form' label-width="80px">
       <img src="../assets/机器猫.jpeg" alt="">
       <el-form-item label="用户名" prop='username'>
-        <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
+        <el-input v-model="form.username" placeholder="请输入用户名" @keyup.enter.native='login'></el-input>
       </el-form-item>
       <el-form-item label="密码" prop='password'>
-        <el-input v-model="form.password" placeholder="请输入密码"  type='password'></el-input>
+        <el-input v-model="form.password" placeholder="请输入密码" type='password' @keyup.enter.native='login'></el-input>
       </el-form-item>
       <el-form-item>
         <el-button class="login" type="primary" @click='login'>登录</el-button>
