@@ -10,7 +10,7 @@
     <el-button type='success' plain @click='showAddRole'>添加角色</el-button>
     <!-- 角色列表 -->
     <el-table :data='roleform'>
-      <el-table-column type='expand' width='30'>
+      <el-table-column type='expand'>
         <template v-slot:default='{ row }'>
           <p v-show='row.children.length === 0'>暂无权限</p>
           <el-row class="level1"  v-for='level1 in row.children' :key='level1.id'>
@@ -26,7 +26,7 @@
           </el-row>
         </template>
       </el-table-column>
-      <el-table-column type='index' label='#' width='30'></el-table-column>
+      <el-table-column type='index' label='#'></el-table-column>
       <el-table-column property='roleName' label='角色名称'></el-table-column>
       <el-table-column property='roleDesc' label='描述'></el-table-column>
       <el-table-column label='操作'>
