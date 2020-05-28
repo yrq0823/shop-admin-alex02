@@ -30,7 +30,7 @@
         <template v-slot:default="{ row }">
           <el-button @click='showEditUserDialog(row)' icon="el-icon-edit" plain size="mini" type="primary"></el-button>
           <el-button @click="delUser(row.id)" icon="el-icon-delete" plain size="mini" type="danger"></el-button>
-          <el-button icon="el-icon-check" plain size="mini" type="success">分配角色</el-button>
+          <el-button @click='assignRoleDialog(row)' icon="el-icon-check" plain size="mini" type="success">分配角色</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -98,6 +98,33 @@
         <el-button type="primary" @click='editUser(editUserForm.id)'>确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 分配角色的 dialog -->
+    <el-dialog
+      title="分配角色"
+      :visible.sync="assignRoleDialogVisible"
+      width="40%"
+      >
+      <el-form ref="assignRoleForm" :model="assignRoleForm" label-width="80px">
+        <el-form-item label="用户名">
+            <el-tag type='info'>{{ assignRoleForm.username }}</el-tag>
+        </el-form-item>
+        <el-form-item label="角色列表">
+          <el-select v-model="assignRoleForm.rid" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+              >
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="assignRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click='assignRole(assignRoleForm)'>确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -139,7 +166,14 @@ export default {
         mobile: [
           { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号格式', trigger: ['blur', 'change'] }
         ]
-      }
+      },
+      assignRoleDialogVisible: false,
+      assignRoleForm: {
+        username: '',
+        id: '',
+        rid: ''
+      },
+      options: []
     }
   },
   created () {
@@ -154,7 +188,6 @@ export default {
           pagesize: this.pagesize
         }
       })
-      console.log(data)
       if (meta.status === 200) {
         this.userform = data.users
         this.total = data.total
@@ -167,12 +200,10 @@ export default {
       this.pagesize = val
       this.pagenum = 1
       this.getUserList()
-      console.log(`每页 ${val} 条`)
     },
     handleCurrentChange (val) {
       this.pagenum = val
       this.getUserList()
-      console.log(`当前页: ${val}`)
     },
     async delUser (id) {
       try {
@@ -238,13 +269,6 @@ export default {
       this.editUserForm.mobile = row.mobile
       this.editUserForm.email = row.email
       this.editUserForm.id = row.id
-      // const { meta, data } = await this.$axios.get(`users/${row.id}`)
-      // if (meta.status === 200) {
-      //   this.editUserForm = data
-      //   this.addUserForm = data
-      // } else {
-      //   this.$message.error(meta.msg)
-      // }
     },
     async editUser () {
       try {
@@ -258,6 +282,40 @@ export default {
         }
       } catch (e) {
         console.log(e)
+      }
+    },
+    async assignRoleDialog (row) {
+      this.assignRoleDialogVisible = true
+      this.assignRoleForm.username = row.username
+      this.assignRoleForm.id = row.id
+      // 根据用户 id 发送 ajax 请求，从后台获取用户 rid
+      const res = await this.$axios.get(`users/${row.id}`)
+      if (res.meta.status === 200) {
+        // 新添加的用户角色id 为 -1，我们设置为空
+        this.assignRoleForm.rid = res.data.rid === -1 ? '' : res.data.rid
+      } else {
+        this.$message.error(res.meta.msg)
+      }
+      // 点击分配角色，打开 dialog 的时候获取 options
+      const { data, meta } = await this.$axios.get('roles')
+      if (meta.status === 200) {
+        this.options = data
+      } else {
+        this.$message.error(meta.msg)
+      }
+    },
+    // 分配角色
+    async assignRole (assignRoleForm) {
+      console.log(assignRoleForm)
+      const { meta } = await this.$axios.put(`users/${assignRoleForm.id}/role`, {
+        rid: assignRoleForm.rid
+      })
+      if (meta.status === 200) {
+        this.$message.success(meta.msg)
+        this.assignRoleDialogVisible = false
+        this.getUserList()
+      } else {
+        this.$message.error(meta.msg)
       }
     }
   }
