@@ -59,7 +59,7 @@
 export default {
   computed: {
     defaultActive () {
-      return this.$route.path.slice(1)
+      return this.$route.path.slice(1).split('-')[0]
     }
   },
   data () {
@@ -71,7 +71,6 @@ export default {
     const { meta, data } = await this.$axios.get('menus')
     if (meta.status === 200) {
       this.menuList = data
-      console.log(data)
     } else {
       this.$message.error(meta.msg)
     }

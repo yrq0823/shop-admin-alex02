@@ -107,7 +107,6 @@ export default {
           pagesize: this.pagesize
         }
       })
-      console.log('getCategoryList -> data', data)
 
       if (meta.status === 200) {
         this.categoryList = data.result
