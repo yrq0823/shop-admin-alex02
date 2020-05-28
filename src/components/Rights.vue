@@ -51,15 +51,5 @@ export default {
 </script>
 
 <style scoped lang='scss'>
-#rights {
-  .el-breadcrumb {
-    border-bottom: 1px solid #ccc;
-    height: 40px;
-    line-height: 40px;
-    font-size: 14px;
-  }
-  .el-table {
-    margin-top: 10px;
-  }
-}
+
 </style>
